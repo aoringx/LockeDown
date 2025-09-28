@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LockedDown Monitor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9fafb;
+      color: #333;
+    }
+
+    h2 {
+      margin-top: 30px;
+      font-size: 1.4em;
+      color: #222;
+      border-left: 5px solid #3b82f6;
+      padding-left: 10px;
+    }
+
+    /* Current session box */
+    .session-box {
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .session-box p {
+      margin: 8px 0;
+      font-size: 0.95em;
+    }
+
+    /* History table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    th {
+      background: #3b82f6;
+      color: #fff;
+      text-align: left;
+      padding: 10px;
+      font-size: 0.95em;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.9em;
+    }
+
+    tr:hover {
+      background: #f1f5f9;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Details row */
+    .details-row {
+      display: none;
+      background: #eef2ff;
+    }
+
+    .details-row td {
+      border-top: none;
+      font-size: 0.85em;
+    }
+
+    .show-btn {
+      cursor: pointer;
+      color: #3b82f6;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h2>Current Session</h2>
+  <div class="session-box">
+    <p><strong>Category:</strong> <span id="category"></span></p>
+    <p><strong>Reason:</strong> <span id="reason"></span></p>
+    <p><strong>Last Data:</strong> <span id="last_data"></span></p>
+    <p><strong>Total Entertainment Time (min):</strong> <span id="total_time"></span></p>
+    <p><strong>Current Points:</strong> <span id="points"></span></p>
+  </div>
+
+  <h2>Session History</h2>
+  <table id="history">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Platform</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    function formatFriendlyTime(isoTimestamp) {
+      const eventDate = new Date(isoTimestamp);
+      const now = new Date();
+
+      // Calculate difference in days
+      const oneDay = 24 * 60 * 60 * 1000;
+      const diffDays = Math.floor((now - eventDate) / oneDay);
+
+      let dayString;
+      if (diffDays === 0) dayString = "Today";
+      else if (diffDays === 1) dayString = "Yesterday";
+      else dayString = eventDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+      const timeString = eventDate.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+
+      return `${dayString}, ${timeString}`;
+    }
+    async function updateSession() {
+      try {
+        const res = await fetch("http://127.0.0.1:8000/session");
+        const data = await res.json();
+
+        // Update current session info
+        document.getElementById("category").innerText = data.current.category;
+        document.getElementById("reason").innerText = data.current.reason;
+        document.getElementById("last_data").innerText = data.current.last_data;
+        document.getElementById("total_time").innerText = (data.current.total_entertainment_time / 60).toFixed(2);
+        document.getElementById("points").innerText = data.current.points.toFixed(2);
+
+        // Update session history table
+        const tbody = document.querySelector("#history tbody");
+        tbody.innerHTML = ""; // clear old rows
+
+    data.history.forEach(event => {
+      const summaryRow = document.createElement("tr");
+      const friendlyTime = formatFriendlyTime(event.timestamp);
+
+      summaryRow.innerHTML = `
+        <td>${friendlyTime}</td>
+        <td>${event.category}</td>
+        <td><button class="show-btn">Show Details</button></td>
+      `;
+
+      const detailsRow = document.createElement("tr");
+      detailsRow.classList.add("details-row");
+      detailsRow.innerHTML = `
+        <td colspan="3">
+          <strong>Data:</strong> ${event.data}<br>
+          <strong>Reason:</strong> ${event.reason}<br>
+          <strong>Total Time (min):</strong> ${event.total_time_min.toFixed(2)}
+        </td>
+      `;
+
+      summaryRow.querySelector(".show-btn").addEventListener("click", () => {
+        detailsRow.style.display = detailsRow.style.display === "table-row" ? "none" : "table-row";
+      });
+
+      tbody.appendChild(summaryRow);
+      tbody.appendChild(detailsRow);
+    });
+      } catch (err) {
+        console.error("Failed to fetch session data:", err);
+      }
+    }
+
+    // Poll every 2 seconds
+    setInterval(updateSession, 2000);
+    updateSession();
+  </script>
+</body>
+</html>

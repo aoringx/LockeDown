@@ -1,0 +1,7 @@
+pywinctl
+pynput
+pyautogui
+pyperclip
+google_genai
+arrow
+uvicorn
