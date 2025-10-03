@@ -3,7 +3,7 @@
 ![Alt text](good.jpeg)
 ![Alt text](warning.jpeg)
 ![Alt text](bad.jpeg)
-[![Watch the video](https://img.youtube.com/vi/bgYIpC2BkNs/mqdefault.jpg)](https://youtu.be/bgYIpC2BkNs)
+Watch Our Video Demo: [![Watch the video](https://img.youtube.com/vi/bgYIpC2BkNs/mqdefault.jpg)](https://youtu.be/bgYIpC2BkNs)
 
 
 # Pose Estimation Using Yolov8m-pose model
