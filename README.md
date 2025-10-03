@@ -1,4 +1,4 @@
-# MHacks 2025 LockeDown 
+# MHacks 2025 Lockedown 
 
 ![Alt text](good.jpeg)
 ![Alt text](warning.jpeg)
