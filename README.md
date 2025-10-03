@@ -1,8 +1,10 @@
 # MHacks 2025 LockeDown 
 
-![Alt text](IMG_8880.DNG)
-![Alt text](IMG_8881.DNG)
-![Alt text](IMG_8882.DNG)
+![Alt text](good.jpeg)
+![Alt text](warning.jpeg)
+![Alt text](bad.jpeg)
+[![Watch the video](https://img.youtube.com/vi/bgYIpC2BkNs/mqdefault.jpg)](https://youtu.be/bgYIpC2BkNs)
+
 
 # Pose Estimation Using Yolov8m-pose model
 
